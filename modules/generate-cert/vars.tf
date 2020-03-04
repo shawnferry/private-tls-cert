@@ -68,6 +68,7 @@ variable "allowed_uses" {
   default = [
     "key_encipherment",
     "digital_signature",
+    "server_auth",
   ]
 }
 
