@@ -41,6 +41,10 @@ variable "ip_addresses" {
   type        = list
 }
 
+variable "ca_validity_period_hours" {
+  description = "The number of hours after initial issuing that the CA certificate will become invalid."
+}
+
 variable "validity_period_hours" {
   description = "The number of hours after initial issuing that the certificate will become invalid."
 }
