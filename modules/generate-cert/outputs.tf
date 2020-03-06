@@ -23,3 +23,6 @@ output "cert_priv_key" {
 output "cert_local" {
   value = tls_locally_signed_cert.cert
 }
+output "cert_csr" {
+  value = tls_cert_request.cert
+}
