@@ -41,14 +41,12 @@ resource "tls_private_key" "cert" {
   ecdsa_curve = var.private_key_ecdsa_curve
   rsa_bits    = var.private_key_rsa_bits
 
-  triggers = {
-    taint_id = null_resource.refresh_all.id
-    cert_id = tls_self_signed_cert.ca.id
-  }
-
   # Store the certificate's private key in a file.
   provisioner "local-exec" {
     command = "echo '${tls_private_key.cert.private_key_pem}' > '${var.private_key_file_path}' && chmod ${var.permissions} '${var.private_key_file_path}' && chown ${var.owner} '${var.private_key_file_path}'"
+  }
+  depends_on {
+    [tls_self_signed_cert.ca]
   }
 }
 
@@ -56,17 +54,15 @@ resource "tls_cert_request" "cert" {
   key_algorithm   = tls_private_key.cert.algorithm
   private_key_pem = tls_private_key.cert.private_key_pem
 
-  triggers = {
-    taint_id = null_resource.refresh_all.id
-    cert_id = tls_self_signed_cert.ca.id
-  }
-
   dns_names    = var.dns_names
   ip_addresses = var.ip_addresses
 
   subject {
     common_name  = var.common_name
     organization = var.organization_name
+  }
+  depends_on {
+    [tls_self_signed_cert.ca]
   }
 }
 
@@ -79,11 +75,6 @@ resource "tls_locally_signed_cert" "cert" {
 
   validity_period_hours = var.validity_period_hours
   allowed_uses          = var.allowed_uses
-
-  triggers = {
-    taint_id = null_resource.refresh_all.id
-    cert_id = tls_self_signed_cert.ca.id
-  }
 
   # Store the certificate's public key in a file.
   provisioner "local-exec" {
