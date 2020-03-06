@@ -2,8 +2,6 @@
 #  CREATE A CA CERTIFICATE
 # ---------------------------------------------------------------------------------------------------------------------
 
-resource "null_resource" "refresh_all" {}
-
 resource "tls_private_key" "ca" {
   triggers {
     taint_id = null_resource.refresh_all.id
@@ -45,9 +43,7 @@ resource "tls_private_key" "cert" {
   provisioner "local-exec" {
     command = "echo '${tls_private_key.cert.private_key_pem}' > '${var.private_key_file_path}' && chmod ${var.permissions} '${var.private_key_file_path}' && chown ${var.owner} '${var.private_key_file_path}'"
   }
-  depends_on {
-    [tls_self_signed_cert.ca]
-  }
+  depends_on = [tls_self_signed_cert.ca]
 }
 
 resource "tls_cert_request" "cert" {
@@ -61,9 +57,7 @@ resource "tls_cert_request" "cert" {
     common_name  = var.common_name
     organization = var.organization_name
   }
-  depends_on {
-    [tls_self_signed_cert.ca]
-  }
+  depends_on = [tls_self_signed_cert.ca]
 }
 
 resource "tls_locally_signed_cert" "cert" {
