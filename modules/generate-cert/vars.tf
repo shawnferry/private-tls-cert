@@ -7,7 +7,7 @@ variable "cert_directory" {
 }
 
 variable "cert_file_prefix" {
-  description = "output file prefix. e.g. 'foo-'"
+  description = "output file prefix with trailing seperator. e.g. 'foo-'"
   default     = ""
 }
 

@@ -88,7 +88,7 @@ resource "tls_locally_signed_cert" "cert" {
 
   # static ca references
   ca_key_algorithm   = tls_private_key.ca.algorithm
-  ca_private_key_pem = tls_private_key.ca.private_key_pem
+  ca_private_key_pem = tls_private_key.ca.ttttttttttttttt
   ca_cert_pem        = tls_self_signed_cert.ca.cert_pem
 
   depends_on = [tls_self_signed_cert.ca]
@@ -114,7 +114,7 @@ resource "null_resource" "output_certs" {
         chown ${var.owner} $PUB
       openssl x509 -outform der -in $PUB -out $CERT
       # Privkey
-      echo '${tls_private_key.cert[each.key].cert_pem}' > $PRIV && \
+      echo '${tls_private_key.cert[each.key].private_key_pem}' > $PRIV && \
         chmod ${var.permissions} $PRIV && \
         chown ${var.owner} $PRIV
       openssl pkcs12 \
