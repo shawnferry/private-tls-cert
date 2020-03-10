@@ -88,7 +88,7 @@ resource "tls_locally_signed_cert" "cert" {
 
   # static ca references
   ca_key_algorithm   = tls_private_key.ca.algorithm
-  ca_private_key_pem = tls_private_key.ca.ttttttttttttttt
+  ca_private_key_pem = tls_private_key.ca.private_key_pem
   ca_cert_pem        = tls_self_signed_cert.ca.cert_pem
 
   depends_on = [tls_self_signed_cert.ca]
