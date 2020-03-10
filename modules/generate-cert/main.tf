@@ -28,15 +28,16 @@ resource "tls_self_signed_cert" "ca" {
       echo '${tls_self_signed_cert.ca.cert_pem}' > $FILE && \
         chmod ${var.permissions} $FILE && \
         chown ${var.owner} $FILE
+      openssl x509 -outform der -in $FILE -out ${FILE}.cer
     DOC
   }
-  # provisioner "local-exec" {
-  #   when    = destroy
-  #   command = <<DOC
-  #     export FILE='${var.cert_directory}/${var.ca_public_key_file_name}'
-  #     rm $FILE
-  #   DOC
-  # }
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<DOC
+      export FILE='${var.cert_directory}/${var.ca_public_key_file_name}'
+      rm $FILE
+    DOC
+  }
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -50,23 +51,7 @@ resource "tls_private_key" "cert" {
   ecdsa_curve = var.private_key_ecdsa_curve
   rsa_bits    = var.private_key_rsa_bits
 
-  # # Store the certificate's private key in a file.
-  # provisioner "local-exec" {
-  #   command = <<DOC
-  #     export FILE='${var.cert_directory}/${each.key}-${var.public_key_file_name_suffix}'
-  #     echo '${tls_private_key.cert[each.key].private_key_pem}' >  $FILE && \
-  #       chmod ${var.permissions} $FILE && \
-  #       chown ${var.owner} $FILE
-  #   DOC
-  # }
 
-  # provisioner "local-exec" {
-  #   when    = destroy
-  #   command = <<DOC
-  #     export FILE='${var.cert_directory}/${each.key}-${var.public_key_file_name_suffix}'
-  #     rm $FILE
-  #   DOC
-  # }
   depends_on = [tls_self_signed_cert.ca]
 }
 
@@ -98,23 +83,5 @@ resource "tls_locally_signed_cert" "cert" {
   ca_private_key_pem = tls_private_key.ca.private_key_pem
   ca_cert_pem        = tls_self_signed_cert.ca.cert_pem
 
-
-  # Store the certificate's public key in a file.
-  # provisioner "local-exec" {
-  #   command = <<DOC
-  #     export FILE='${var.cert_directory}/${each.key}-${var.public_key_file_name_suffix}'
-  #     echo '${tls_locally_signed_cert.cert[each.key].cert_pem}' > $FILE && \
-  #       chmod ${var.permissions} $FILE && \
-  #       chown ${var.owner} $FILE
-  #   DOC
-  # }
-
-  # provisioner "local-exec" {
-  #   when    = "destroy"
-  #   command = <<DOC
-  #     export FILE='${var.cert_directory}/${each.key}-${var.public_key_file_name_suffix}'
-  #     rm $FILE
-  #   DOC
-  # }
   depends_on = [tls_self_signed_cert.ca]
 }

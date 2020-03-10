@@ -5,19 +5,9 @@ output "cert_directory" {
 output "ca_priv_key" {
   value = tls_private_key.ca
 }
-output "ca_cert" {
+output "ca_public_cert" {
   value = tls_self_signed_cert.ca
 }
-
-# output "cert_priv_key" {
-#   value = tls_private_key.cert
-# }
-# output "cert_local" {
-#   value = tls_locally_signed_cert.cert
-# }
-# output "cert_csr" {
-#   value = tls_cert_request.cert
-# }
 
 output "certs" {
   value = {
