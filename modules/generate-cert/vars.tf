@@ -25,7 +25,7 @@ variable "ca_validity_period_hours" {
 
 # Certs
 variable "certs" {
-  type = map
+  type        = map
   description = <<DOC
   Map of lists defining certificates to create
     {
@@ -47,17 +47,17 @@ variable "certs" {
 # ---------------------------------------------------------------------------------------------------------------------
 variable "public_key_file_name_suffix" {
   description = "Create certificate public keys with this suffix (e.g. <my-app>.crt.pem)."
-  default = ".crt.pem"
+  default     = ".crt.pem"
 }
 
 variable "private_key_file_name_suffix" {
   description = "Write the PEM-encoded certificate private key to this path (e.g. <my-app>.key.pem)."
-  default = ".key.pem"
+  default     = ".key.pem"
 }
 
 variable "ca_public_key_file_name" {
   description = "Write the PEM-encoded CA certificate public key to this path (e.g. ca.crt.pem)."
-  default = "ca.crt.pem"
+  default     = "ca.crt.pem"
 }
 
 variable "ca_allowed_uses" {

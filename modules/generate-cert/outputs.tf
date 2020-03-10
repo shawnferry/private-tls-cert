@@ -22,10 +22,10 @@ output "ca_cert" {
 output "certs" {
   value = {
     for cn in keys(var.certs) :
-      cn => {
-        priv_key = tls_private_key.cert[cn]
-        pub_key = tls_locally_signed_cert.cert[cn]
-        csr = tls_cert_request.cert[cn]
-      }
+    cn => {
+      priv_key = tls_private_key.cert[cn]
+      pub_key  = tls_locally_signed_cert.cert[cn]
+      csr      = tls_cert_request.cert[cn]
+    }
   }
 }
