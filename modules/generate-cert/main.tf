@@ -32,7 +32,7 @@ resource "tls_self_signed_cert" "ca" {
   provisioner "local-exec" {
     command = <<DOC
       export PUB='${var.cert_directory}/${var.cert_file_prefix}${var.ca_public_key_file_name}.pem'
-      export CERT='${var.cert_directory}/${var.cert_file_prefix}${var.ca_public_key_file_name}.crt'
+      export CERT='${var.cert_directory}/${var.cert_file_prefix}${var.ca_public_key_file_name}.cer'
       echo '${tls_self_signed_cert.ca.cert_pem}' > $PUB && \
         chmod ${var.permissions} $PUB && \
         chown ${var.owner} $PUB
