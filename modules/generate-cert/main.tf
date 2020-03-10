@@ -24,11 +24,12 @@ resource "tls_self_signed_cert" "ca" {
   # Store the CA public key in a file.
   provisioner "local-exec" {
     command = <<DOC
-      export FILE='${var.cert_directory}/${var.cert_file_prefix}${var.ca_public_key_file_name}'
+      export FILE='${var.cert_directory}/${var.cert_file_prefix}${var.ca_public_key_file_name}.pem'
+      export CERT='${var.cert_directory}/${var.cert_file_prefix}${var.ca_public_key_file_name}.crt'
       echo '${tls_self_signed_cert.ca.cert_pem}' > $FILE && \
         chmod ${var.permissions} $FILE && \
         chown ${var.owner} $FILE
-      openssl x509 -outform der -in $FILE -out $\{FILE\}.cer
+      openssl x509 -outform der -in $FILE -out $CERT
     DOC
   }
   # provisioner "local-exec" {
@@ -84,4 +85,20 @@ resource "tls_locally_signed_cert" "cert" {
   ca_cert_pem        = tls_self_signed_cert.ca.cert_pem
 
   depends_on = [tls_self_signed_cert.ca]
+}
+
+resource "null_resource" "output_certs" {
+  # Changes to any instance of the cluster requires re-provisioning
+  triggers = {
+    cert_id = tls_self_signed_cert.ca.id
+  }
+
+  provisioner "local-exec" {
+    # Bootstrap script called with private_ip of each node in the clutser
+    command = <<-DOC
+      export FILE='${var.cert_directory}/${var.cert_file_prefix}${var.ca_public_key_file_name}'
+      openssl x509 -outform der -in ${local.ca_cert_pem} -out ${local.ca_cert_cer}
+      base64 ${local.ca_cert_cer} > ${local.ca_cert_cer_txt}
+    DOC
+  }
 }

@@ -51,18 +51,18 @@ variable "certs" {
 # These parameters have reasonable defaults.
 # ---------------------------------------------------------------------------------------------------------------------
 variable "public_key_file_name_suffix" {
-  description = "Create certificate public keys with this suffix (e.g. <my-app>.crt.pem)."
-  default     = ".crt.pem"
+  description = "Create certificate public keys with this suffix (e.g. <my-app>.crt)[.pem]"
+  default     = ".crt"
 }
 
 variable "private_key_file_name_suffix" {
-  description = "Write the PEM-encoded certificate private key to this path (e.g. <my-app>.key.pem)."
-  default     = ".key.pem"
+  description = "Write the PEM-encoded certificate private key to this path (e.g. <my-app>.key[.pem])."
+  default     = ".key"
 }
 
 variable "ca_public_key_file_name" {
-  description = "Write the PEM-encoded CA certificate public key to this path (e.g. ca.crt.pem)."
-  default     = "ca.crt.pem"
+  description = "Write the PEM-encoded CA certificate public key to this path (e.g. ca.crt[.pem])."
+  default     = "ca.crt"
 }
 
 variable "ca_allowed_uses" {
