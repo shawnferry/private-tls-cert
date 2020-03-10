@@ -6,6 +6,11 @@ variable "cert_directory" {
   description = "Write the certificate files to this directory (e.g. /etc/tls/)."
 }
 
+variable "cert_file_prefix" {
+  description = "output file prefix. e.g. 'foo-'"
+  default     = ""
+}
+
 variable "owner" {
   description = "The OS user who should be given ownership over the certificate files."
 }

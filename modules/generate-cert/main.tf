@@ -24,7 +24,7 @@ resource "tls_self_signed_cert" "ca" {
   # Store the CA public key in a file.
   provisioner "local-exec" {
     command = <<DOC
-      export FILE='${var.cert_directory}/${var.ca_public_key_file_name}'
+      export FILE='${var.cert_directory}/${var.cert_file_prefix}${var.ca_public_key_file_name}'
       echo '${tls_self_signed_cert.ca.cert_pem}' > $FILE && \
         chmod ${var.permissions} $FILE && \
         chown ${var.owner} $FILE
