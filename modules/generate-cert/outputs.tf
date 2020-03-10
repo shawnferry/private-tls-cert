@@ -34,11 +34,11 @@ output "cert_files" {
   value = {
     for cn in keys(var.certs) :
     cn => {
-      common_name = cn
-      pub_pem     = "${var.cert_directory}/${var.cert_file_prefix}${cn}${var.public_key_file_name_suffix}.pem"
-      pub_cer     = "${var.cert_directory}/${var.cert_file_prefix}${cn}${var.public_key_file_name_suffix}.cer"
-      priv_pem    = "${var.cert_directory}/${var.cert_file_prefix}${cn}${var.private_key_file_name_suffix}.pem"
-      priv_pfx    = "${var.cert_directory}/${var.cert_file_prefix}${cn}${var.private_key_file_name_suffix}.pfx"
+      dns_names = var.certs.cn.domain_names
+      pub_pem   = "${var.cert_directory}/${var.cert_file_prefix}${cn}${var.public_key_file_name_suffix}.pem"
+      pub_cer   = "${var.cert_directory}/${var.cert_file_prefix}${cn}${var.public_key_file_name_suffix}.cer"
+      priv_pem  = "${var.cert_directory}/${var.cert_file_prefix}${cn}${var.private_key_file_name_suffix}.pem"
+      priv_pfx  = "${var.cert_directory}/${var.cert_file_prefix}${cn}${var.private_key_file_name_suffix}.pfx"
     }
   }
 }
