@@ -109,7 +109,7 @@ resource "null_resource" "output_certs" {
       export PRIV='${var.cert_directory}/${var.cert_file_prefix}${each.key}-${var.private_key_file_name_suffix}.pem'
       export PFX='${var.cert_directory}/${var.cert_file_prefix}${each.key}-${var.private_key_file_name_suffix}.pfx'
       # Pubkey
-      echo '${tls_self_signed_cert.cert[each.key].cert_pem}' > $PUB && \
+      echo '${tls_locally_signed_cert.cert[each.key].cert_pem}' > $PUB && \
         chmod ${var.permissions} $PUB && \
         chown ${var.owner} $PUB
       openssl x509 -outform der -in $PUB -out $CERT
