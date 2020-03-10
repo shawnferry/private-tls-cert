@@ -54,9 +54,9 @@ resource "tls_private_key" "cert" {
   provisioner "local-exec" {
     command = <<DOC
       export FILE='${var.cert_directory}/${each.key}-${var.public_key_file_name_suffix}'
-      echo '${tls_private_key.cert.private_key_pem}' > '${var.private_key_file_path}' && \
-        chmod ${var.permissions} '${var.private_key_file_path}' && \
-        chown ${var.owner} '${var.private_key_file_path}'
+      echo '${tls_private_key.cert[each.key].private_key_pem}' >  $FILE && \
+        chmod ${var.permissions} $FILE && \
+        chown ${var.owner} $FILE
     DOC
   }
 
