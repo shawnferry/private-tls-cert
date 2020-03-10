@@ -95,7 +95,7 @@ resource "tls_locally_signed_cert" "cert" {
   ca_private_key_pem = tls_private_key.ca.private_key_pem
   ca_cert_pem        = tls_self_signed_cert.ca.cert_pem
 
-  validity_period_hours = var.validity_period_hours
+  validity_period_hours = each.value.validity_period_hours
   allowed_uses          = var.allowed_uses
 
   # Store the certificate's public key in a file.

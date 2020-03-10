@@ -24,7 +24,7 @@ output "certs" {
     for cn in keys(var.certs) :
       cn => {
         priv_key = tls_private_key.cert[cn]
-        pub_key = tls_public_key.cert[cn]
+        pub_key = tls_locally_signed_cert.cert[cn]
         csr = tls_cert_request.cert[cn]
       }
   }
