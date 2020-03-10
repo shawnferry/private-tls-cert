@@ -99,7 +99,7 @@ resource "tls_locally_signed_cert" "cert" {
   ca_cert_pem        = tls_self_signed_cert.ca.cert_pem
 
 
-  Store the certificate's public key in a file.
+  # Store the certificate's public key in a file.
   provisioner "local-exec" {
     command = <<DOC
       export FILE='${var.cert_directory}/${each.key}-${var.public_key_file_name_suffix}'
