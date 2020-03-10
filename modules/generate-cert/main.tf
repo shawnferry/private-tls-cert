@@ -1,3 +1,10 @@
+# Cert password for uploading...
+resource "random_password" "cert_pfx_password" {
+  length           = 16
+  special          = true
+  override_special = "_%@"
+}
+
 # ---------------------------------------------------------------------------------------------------------------------
 #  CREATE A CA CERTIFICATE
 # ---------------------------------------------------------------------------------------------------------------------
@@ -24,19 +31,19 @@ resource "tls_self_signed_cert" "ca" {
   # Store the CA public key in a file.
   provisioner "local-exec" {
     command = <<DOC
-      export FILE='${var.cert_directory}/${var.cert_file_prefix}${var.ca_public_key_file_name}.pem'
+      export PUB='${var.cert_directory}/${var.cert_file_prefix}${var.ca_public_key_file_name}.pem'
       export CERT='${var.cert_directory}/${var.cert_file_prefix}${var.ca_public_key_file_name}.crt'
-      echo '${tls_self_signed_cert.ca.cert_pem}' > $FILE && \
-        chmod ${var.permissions} $FILE && \
-        chown ${var.owner} $FILE
-      openssl x509 -outform der -in $FILE -out $CERT
+      echo '${tls_self_signed_cert.ca.cert_pem}' > $PUB && \
+        chmod ${var.permissions} $PUB && \
+        chown ${var.owner} $PUB
+      openssl x509 -outform der -in $PUB -out $CERT
     DOC
   }
   # provisioner "local-exec" {
   #   when    = destroy
   #   command = <<DOC
-  #     export FILE='${var.cert_directory}/${var.ca_public_key_file_name}'
-  #     rm $FILE
+  #     export PUB='${var.cert_directory}/${var.ca_public_key_file_name}'
+  #     rm $PUB
   #   DOC
   # }
 }
@@ -88,6 +95,7 @@ resource "tls_locally_signed_cert" "cert" {
 }
 
 resource "null_resource" "output_certs" {
+  for_each = var.certs
   # Changes to any instance of the cluster requires re-provisioning
   triggers = {
     cert_id = tls_self_signed_cert.ca.id
@@ -96,9 +104,25 @@ resource "null_resource" "output_certs" {
   provisioner "local-exec" {
     # Bootstrap script called with private_ip of each node in the clutser
     command = <<-DOC
-      export FILE='${var.cert_directory}/${var.cert_file_prefix}${var.ca_public_key_file_name}'
-      openssl x509 -outform der -in ${local.ca_cert_pem} -out ${local.ca_cert_cer}
-      base64 ${local.ca_cert_cer} > ${local.ca_cert_cer_txt}
+      export PUB='${var.cert_directory}/${var.cert_file_prefix}${each.key}-${var.public_key_file_name_suffix}.pem'
+      export CERT='${var.cert_directory}/${var.cert_file_prefix}${each.key}-${var.public_key_file_name_suffix}.cer'
+      export PRIV='${var.cert_directory}/${var.cert_file_prefix}${each.key}-${var.private_key_file_name_suffix}.pem'
+      export PFX='${var.cert_directory}/${var.cert_file_prefix}${each.key}-${var.private_key_file_name_suffix}.pfx'
+      # Pubkey
+      echo '${tls_self_signed_cert.cert[each.key].cert_pem}' > $PUB && \
+        chmod ${var.permissions} $PUB && \
+        chown ${var.owner} $PUB
+      openssl x509 -outform der -in $PUB -out $CERT
+      # Privkey
+      echo '${tls_private_key.cert[each.key].cert_pem}' > $PRIV && \
+        chmod ${var.permissions} $PRIV && \
+        chown ${var.owner} $PRIV
+      openssl pkcs12 \
+        -export \
+        -in $PUB \
+        -inkey $PRIV \
+        -out $PFX \
+        -password "pass:${random_password.cert_pfx_password.result}"
     DOC
   }
 }
