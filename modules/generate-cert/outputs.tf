@@ -1,13 +1,5 @@
-output "ca_public_key_file_path" {
-  value = var.ca_public_key_file_path
-}
-
-output "public_key_file_path" {
-  value = var.public_key_file_path
-}
-
-output "private_key_file_path" {
-  value = var.private_key_file_path
+output "cert_directory" {
+  value = var.cert_directory
 }
 
 output "ca_priv_key" {
@@ -17,12 +9,23 @@ output "ca_cert" {
   value = tls_self_signed_cert.ca
 }
 
-output "cert_priv_key" {
-  value = tls_private_key.cert
-}
-output "cert_local" {
-  value = tls_locally_signed_cert.cert
-}
-output "cert_csr" {
-  value = tls_cert_request.cert
+# output "cert_priv_key" {
+#   value = tls_private_key.cert
+# }
+# output "cert_local" {
+#   value = tls_locally_signed_cert.cert
+# }
+# output "cert_csr" {
+#   value = tls_cert_request.cert
+# }
+
+output "certs" {
+  value = {
+    for cn in keys(var.certs) :
+      cn => {
+        priv_key = tls_private_key.cert[cn]
+        pub_key = tls_public_key.cert[cn]
+        csr = tls_cert_request.cert[cn]
+      }
+  }
 }
