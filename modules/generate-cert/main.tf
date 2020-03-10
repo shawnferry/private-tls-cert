@@ -28,16 +28,16 @@ resource "tls_self_signed_cert" "ca" {
       echo '${tls_self_signed_cert.ca.cert_pem}' > $FILE && \
         chmod ${var.permissions} $FILE && \
         chown ${var.owner} $FILE
-      openssl x509 -outform der -in $FILE -out ${FILE}.cer
+      openssl x509 -outform der -in $FILE -out $\{FILE\}.cer
     DOC
   }
-  provisioner "local-exec" {
-    when    = destroy
-    command = <<DOC
-      export FILE='${var.cert_directory}/${var.ca_public_key_file_name}'
-      rm $FILE
-    DOC
-  }
+  # provisioner "local-exec" {
+  #   when    = destroy
+  #   command = <<DOC
+  #     export FILE='${var.cert_directory}/${var.ca_public_key_file_name}'
+  #     rm $FILE
+  #   DOC
+  # }
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
