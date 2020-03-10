@@ -100,14 +100,14 @@ resource "tls_locally_signed_cert" "cert" {
 
 
   # Store the certificate's public key in a file.
-  provisioner "local-exec" {
-    command = <<DOC
-      export FILE='${var.cert_directory}/${each.key}-${var.public_key_file_name_suffix}'
-      echo '${tls_locally_signed_cert.cert[each.key].cert_pem}' > $FILE && \
-        chmod ${var.permissions} $FILE && \
-        chown ${var.owner} $FILE
-    DOC
-  }
+  # provisioner "local-exec" {
+  #   command = <<DOC
+  #     export FILE='${var.cert_directory}/${each.key}-${var.public_key_file_name_suffix}'
+  #     echo '${tls_locally_signed_cert.cert[each.key].cert_pem}' > $FILE && \
+  #       chmod ${var.permissions} $FILE && \
+  #       chown ${var.owner} $FILE
+  #   DOC
+  # }
 
   # provisioner "local-exec" {
   #   when    = "destroy"
