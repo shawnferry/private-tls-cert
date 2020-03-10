@@ -30,13 +30,13 @@ resource "tls_self_signed_cert" "ca" {
         chown ${var.owner} $FILE
     DOC
   }
-  provisioner "local-exec" {
-    when    = destroy
-    command = <<DOC
-      export FILE='${var.cert_directory}/${var.ca_public_key_file_name}'
-      rm $FILE
-    DOC
-  }
+  # provisioner "local-exec" {
+  #   when    = destroy
+  #   command = <<DOC
+  #     export FILE='${var.cert_directory}/${var.ca_public_key_file_name}'
+  #     rm $FILE
+  #   DOC
+  # }
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -60,13 +60,13 @@ resource "tls_private_key" "cert" {
     DOC
   }
 
-  provisioner "local-exec" {
-    when    = destroy
-    command = <<DOC
-      export FILE='${var.cert_directory}/${each.key}-${var.public_key_file_name_suffix}'
-      rm $FILE
-    DOC
-  }
+  # provisioner "local-exec" {
+  #   when    = destroy
+  #   command = <<DOC
+  #     export FILE='${var.cert_directory}/${each.key}-${var.public_key_file_name_suffix}'
+  #     rm $FILE
+  #   DOC
+  # }
   depends_on = [tls_self_signed_cert.ca]
 }
 
@@ -108,11 +108,11 @@ resource "tls_locally_signed_cert" "cert" {
     DOC
   }
 
-  provisioner "local-exec" {
-    when    = "destroy"
-    command = <<DOC
-      export FILE='${var.cert_directory}/${each.key}-${var.public_key_file_name_suffix}'
-      rm $FILE
-    DOC
-  }
+  # provisioner "local-exec" {
+  #   when    = "destroy"
+  #   command = <<DOC
+  #     export FILE='${var.cert_directory}/${each.key}-${var.public_key_file_name_suffix}'
+  #     rm $FILE
+  #   DOC
+  # }
 }
