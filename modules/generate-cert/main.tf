@@ -89,7 +89,7 @@ resource "tls_cert_request" "cert" {
 resource "tls_locally_signed_cert" "cert" {
   for_each = var.certs
 
-  cert_request_pem = tls_cert_request.cert.cert_request_pem
+  cert_request_pem = tls_cert_request.cert[each.key].cert_request_pem
 
   ca_key_algorithm   = tls_private_key.ca.algorithm
   ca_private_key_pem = tls_private_key.ca.private_key_pem
@@ -102,7 +102,7 @@ resource "tls_locally_signed_cert" "cert" {
   provisioner "local-exec" {
     command = <<DOC
       export FILE='${var.cert_directory}/${each.key}-${var.public_key_file_name_suffix}'
-      echo '${tls_locally_signed_cert.cert.cert_pem}' > $FILE && \
+      echo '${tls_locally_signed_cert.cert[each.key].cert_pem}' > $FILE && \
         chmod ${var.permissions} $FILE && \
         chown ${var.owner} $FILE
     DOC
