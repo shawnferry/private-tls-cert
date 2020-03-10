@@ -23,7 +23,19 @@ resource "tls_self_signed_cert" "ca" {
 
   # Store the CA public key in a file.
   provisioner "local-exec" {
-    command = "echo '${tls_self_signed_cert.ca.cert_pem}' > '${var.ca_public_key_file_path}' && chmod ${var.permissions} '${var.ca_public_key_file_path}' && chown ${var.owner} '${var.ca_public_key_file_path}'"
+    command = <<DOC
+      export FILE='${var.cert_directory}/${var.ca_public_key_file_name}'
+      echo '${tls_self_signed_cert.ca.cert_pem}' > $FILE && \
+        chmod ${var.permissions} $FILE && \
+        chown ${var.owner} $FILE
+    DOC
+  }
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<DOC
+      export FILE='${var.cert_directory}/${var.ca_public_key_file_name}'
+      rm $FILE
+    DOC
   }
 }
 
@@ -32,32 +44,51 @@ resource "tls_self_signed_cert" "ca" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 resource "tls_private_key" "cert" {
+  for_each = var.certs
+
   algorithm   = var.private_key_algorithm
   ecdsa_curve = var.private_key_ecdsa_curve
   rsa_bits    = var.private_key_rsa_bits
 
   # Store the certificate's private key in a file.
   provisioner "local-exec" {
-    command = "echo '${tls_private_key.cert.private_key_pem}' > '${var.private_key_file_path}' && chmod ${var.permissions} '${var.private_key_file_path}' && chown ${var.owner} '${var.private_key_file_path}'"
+    command = <<DOC
+      export FILE='${var.cert_directory}/${each.key}-${var.public_key_file_name_suffix}'
+      echo '${tls_private_key.cert.private_key_pem}' > '${var.private_key_file_path}' && \
+        chmod ${var.permissions} '${var.private_key_file_path}' && \
+        chown ${var.owner} '${var.private_key_file_path}'
+    DOC
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<DOC
+      export FILE='${var.cert_directory}/${each.key}-${var.public_key_file_name_suffix}'
+      rm $FILE
+    DOC
   }
   depends_on = [tls_self_signed_cert.ca]
 }
 
 resource "tls_cert_request" "cert" {
+  for_each = var.certs
+
   key_algorithm   = tls_private_key.cert.algorithm
   private_key_pem = tls_private_key.cert.private_key_pem
 
-  dns_names    = var.dns_names
-  ip_addresses = var.ip_addresses
+  dns_names    = each.value.dns_names
+  ip_addresses = each.value.ip_addresses
 
   subject {
-    common_name  = var.common_name
+    common_name  = each.key
     organization = var.organization_name
   }
   depends_on = [tls_self_signed_cert.ca]
 }
 
 resource "tls_locally_signed_cert" "cert" {
+  for_each = var.certs
+
   cert_request_pem = tls_cert_request.cert.cert_request_pem
 
   ca_key_algorithm   = tls_private_key.ca.algorithm
@@ -69,6 +100,19 @@ resource "tls_locally_signed_cert" "cert" {
 
   # Store the certificate's public key in a file.
   provisioner "local-exec" {
-    command = "echo '${tls_locally_signed_cert.cert.cert_pem}' > '${var.public_key_file_path}' && chmod ${var.permissions} '${var.public_key_file_path}' && chown ${var.owner} '${var.public_key_file_path}'"
+    command = <<DOC
+      export FILE='${var.cert_directory}/${each.key}-${var.public_key_file_name_suffix}'
+      echo '${tls_locally_signed_cert.cert.cert_pem}' > $FILE && \
+        chmod ${var.permissions} $FILE && \
+        chown ${var.owner} $FILE
+    DOC
+  }
+
+  provisioner "local-exec" {
+    when    = "destroy"
+    command = <<DOC
+      export FILE='${var.cert_directory}/${each.key}-${var.public_key_file_name_suffix}'
+      rm $FILE
+    DOC
   }
 }
