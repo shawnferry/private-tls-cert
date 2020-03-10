@@ -39,14 +39,6 @@ resource "tls_self_signed_cert" "ca" {
       openssl x509 -outform der -in $PUB -out $CERT
     DOC
   }
-  provisioner "local-exec" {
-    when    = destroy
-    command = <<DOC
-      export PUB='${var.cert_directory}/${var.cert_file_prefix}${var.ca_public_key_file_name}.pem'
-      export CERT='${var.cert_directory}/${var.cert_file_prefix}${var.ca_public_key_file_name}.crt'
-      rm -f "$PUB" "$CERT"
-    DOC
-  }
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -124,17 +116,6 @@ resource "null_resource" "output_certs" {
         -inkey $PRIV \
         -out $PFX \
         -password "pass:${random_password.cert_pfx_password.result}"
-    DOC
-  }
-
-  provisioner "local-exec" {
-    when    = destroy
-    command = <<-DOC
-      export PUB='${var.cert_directory}/${var.cert_file_prefix}${each.key}${var.public_key_file_name_suffix}.pem'
-      export CERT='${var.cert_directory}/${var.cert_file_prefix}${each.key}${var.public_key_file_name_suffix}.cer'
-      export PRIV='${var.cert_directory}/${var.cert_file_prefix}${each.key}${var.private_key_file_name_suffix}.pem'
-      export PFX='${var.cert_directory}/${var.cert_file_prefix}${each.key}${var.private_key_file_name_suffix}.pfx'
-      rm -f "$PUB" "$CERT" "$PRIV" "$PFX"
     DOC
   }
 }
