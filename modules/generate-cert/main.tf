@@ -73,8 +73,8 @@ resource "tls_private_key" "cert" {
 resource "tls_cert_request" "cert" {
   for_each = var.certs
 
-  key_algorithm   = tls_private_key.cert.algorithm
-  private_key_pem = tls_private_key.cert.private_key_pem
+  key_algorithm   = tls_private_key.cert[each.key].algorithm
+  private_key_pem = tls_private_key.cert[each.key].private_key_pem
 
   dns_names    = each.value.dns_names
   ip_addresses = each.value.ip_addresses
