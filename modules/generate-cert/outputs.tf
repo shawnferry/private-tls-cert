@@ -17,6 +17,7 @@ output "cert_files" {
   }
 }
 
-output "pfx_password" {
-  value = random_password.cert_pfx_password.result
+output "cert_pfx_password" {
+  value    = random_password.cert_pfx_password.result
+  senitive = true
 }
