@@ -1,7 +1,7 @@
 output "ca_files" {
   value = {
     pub_pem = "${var.cert_directory}/${var.cert_file_prefix}${var.ca_public_key_file_name}.pem"
-    pub_cer = "${var.cert_directory}/${var.cert_file_prefix}${var.ca_public_key_file_name}.crt"
+    pub_cer = "${var.cert_directory}/${var.cert_file_prefix}${var.ca_public_key_file_name}.cer"
   }
 }
 
