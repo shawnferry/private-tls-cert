@@ -18,6 +18,6 @@ output "cert_files" {
 }
 
 output "cert_pfx_password" {
-  value    = random_password.cert_pfx_password.result
-  senitive = true
+  value     = random_password.cert_pfx_password.result
+  sensitive = true
 }
