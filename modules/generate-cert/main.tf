@@ -39,6 +39,8 @@ resource "tls_self_signed_cert" "ca" {
       openssl x509 -outform der -in $PUB -out $CERT
     DOC
   }
+
+  depends_on = [tls_private_key.ca]
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
