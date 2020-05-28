@@ -94,7 +94,7 @@ resource "null_resource" "output_certs" {
   # Changes to any instance of the cluster requires re-provisioning
   triggers = {
     ca_id   = tls_self_signed_cert.ca.id
-    cert_id = tls_locally_signed_cert.cert[each.key]
+    cert_id = tls_locally_signed_cert.cert[each.key].cert_pem
   }
 
   provisioner "local-exec" {
